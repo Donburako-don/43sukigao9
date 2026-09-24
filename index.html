@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>43期ルート好き顔9選</title>
 
 <style>
@@ -14,54 +15,64 @@ body {
   margin: 0;
   background: #fff8f5;
   color: #5a4a45;
-  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
-               "Yu Gothic", sans-serif;
-  text-align: center;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
 }
 
+/* 共通 */
 .screen {
   min-height: 100vh;
-  padding: 32px 18px;
+  padding: 30px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+/* タイトル */
 h1 {
-  font-size: 26px;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
+  font-size: 25px;
+  font-weight: 700;
+  text-align: center;
 }
 
 .subtitle {
+  margin: 0 0 22px;
   font-size: 14px;
-  margin: 0 0 28px;
   color: #8b7770;
+  text-align: center;
 }
 
+/* 問題数 */
 .progress {
+  margin-bottom: 12px;
   font-size: 13px;
-  margin-bottom: 14px;
   color: #9b8179;
 }
 
+/* 2択 */
 .choices {
   width: 100%;
   max-width: 700px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .choice {
-  border: none;
   padding: 0;
+  border: none;
   background: white;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 3px 12px rgba(80, 50, 40, 0.12);
+  box-shadow: 0 3px 12px rgba(80, 50, 40, 0.15);
   cursor: pointer;
-  transition: transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .choice:active {
@@ -69,65 +80,81 @@ h1 {
 }
 
 .choice img {
+  display: block;
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  display: block;
 }
 
+/* 結果 */
 #result {
   display: none;
 }
 
 .result-title {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .result-grid {
   width: 100%;
   max-width: 600px;
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 4px;
 }
 
 .result-grid img {
+  display: block;
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  display: block;
 }
 
+/* もう一度 */
 .retry {
-  margin-top: 28px;
+  margin-top: 26px;
+  padding: 12px 24px;
+
   border: none;
+  border-radius: 999px;
+
   background: #5a4a45;
   color: white;
-  padding: 13px 26px;
-  border-radius: 999px;
+
   font-size: 14px;
   cursor: pointer;
 }
 
+/* スマホ */
 @media (max-width: 480px) {
+
   .screen {
-    padding: 24px 12px;
+    padding: 24px 10px;
   }
 
   h1 {
-    font-size: 23px;
+    font-size: 22px;
   }
 
   .choices {
-    gap: 8px;
+    gap: 7px;
+  }
+
+  .choice {
+    border-radius: 10px;
   }
 }
 </style>
 </head>
 
+
 <body>
 
-<!-- ゲーム画面 -->
+<!-- =========================
+     ゲーム画面
+========================= -->
+
 <div id="game" class="screen">
 
   <h1>43期ルート好き顔9選</h1>
@@ -141,21 +168,29 @@ h1 {
   </div>
 
   <div class="choices">
+
     <button class="choice" onclick="choose(0)">
-      <img id="imageA" src="01.jpg" alt="">
+      <img id="imageA" src="images/01.jpg" alt="">
     </button>
 
     <button class="choice" onclick="choose(1)">
-      <img id="imageB" src="02.jpg" alt="">
+      <img id="imageB" src="images/02.jpg" alt="">
     </button>
+
   </div>
 
 </div>
 
-<!-- 結果画面 -->
+
+<!-- =========================
+     結果画面
+========================= -->
+
 <div id="result" class="screen">
 
-  <h1 class="result-title">好き顔9選</h1>
+  <h1 class="result-title">
+    好き顔9選
+  </h1>
 
   <div id="resultGrid" class="result-grid"></div>
 
@@ -168,31 +203,54 @@ h1 {
 
 <script>
 
+/* =========================
+   画像一覧
+========================= */
+
 const images = [];
 
 for (let i = 1; i <= 27; i++) {
-  images.push("images/" + String(i).padStart(2, "0") + ".jpg");
 
-let ratings = Array(27).fill(1500);
-let wins = Array(27).fill(0);
+  const number = String(i).padStart(2, "0");
+
+  images.push("images/" + number + ".jpg");
+
+}
+
+
+/* =========================
+   初期設定
+========================= */
+
+const PEOPLE = 27;
+const TOTAL_COMPARISONS = 52;
+
+let ratings = Array(PEOPLE).fill(1500);
+let wins = Array(PEOPLE).fill(0);
 
 let comparisons = [];
 let comparisonIndex = 0;
 
-const TOTAL_COMPARISONS = 52;
 
+/* =========================
+   52回分の対戦を作る
+========================= */
 
-/* 52回分の対戦カードを作る */
 function createComparisons() {
 
   comparisons = [];
 
   for (let round = 0; round < 4; round++) {
 
-    let people = Array.from({length: 27}, (_, i) => i);
+    let people = Array.from(
+      { length: PEOPLE },
+      (_, index) => index
+    );
 
+    /* 毎ラウンド順番をランダムにする */
     people.sort(() => Math.random() - 0.5);
 
+    /* 2人ずつ対戦 */
     for (let i = 0; i < people.length - 1; i += 2) {
 
       comparisons.push([
@@ -201,36 +259,57 @@ function createComparisons() {
       ]);
 
     }
+
   }
 
-  comparisons = comparisons.slice(0, TOTAL_COMPARISONS);
 }
 
 
-/* Elo方式で順位を更新 */
-function updateRating(a, b) {
+/* =========================
+   Elo方式で順位を更新
+========================= */
 
-  const Ra = ratings[a];
-  const Rb = ratings[b];
+function updateRating(winner, loser) {
 
-  const expectedA =
-    1 / (1 + Math.pow(10, (Rb - Ra) / 400));
+  const winnerRating = ratings[winner];
+  const loserRating = ratings[loser];
 
-  const expectedB =
-    1 - expectedA;
+  const expectedWinner =
+    1 /
+    (
+      1 +
+      Math.pow(
+        10,
+        (loserRating - winnerRating) / 400
+      )
+    );
 
-  ratings[a] += 32 * (1 - expectedA);
-  ratings[b] += 32 * (0 - expectedB);
+  const expectedLoser =
+    1 - expectedWinner;
 
-  wins[a]++;
+  const K = 32;
+
+  ratings[winner] +=
+    K * (1 - expectedWinner);
+
+  ratings[loser] +=
+    K * (0 - expectedLoser);
+
+  wins[winner]++;
+
 }
 
 
-/* 画像を表示 */
+/* =========================
+   次の問題を表示
+========================= */
+
 function showComparison() {
 
   if (comparisonIndex >= TOTAL_COMPARISONS) {
+
     showResult();
+
     return;
   }
 
@@ -244,70 +323,115 @@ function showComparison() {
 
   document.getElementById("current").textContent =
     comparisonIndex + 1;
+
 }
 
 
-/* 選択された */
+/* =========================
+   どちらかを選択
+========================= */
+
 function choose(side) {
 
   const pair = comparisons[comparisonIndex];
 
-  const winner =
-    side === 0 ? pair[0] : pair[1];
+  let winner;
+  let loser;
 
-  const loser =
-    side === 0 ? pair[1] : pair[0];
+  if (side === 0) {
+
+    winner = pair[0];
+    loser = pair[1];
+
+  } else {
+
+    winner = pair[1];
+    loser = pair[0];
+
+  }
 
   updateRating(winner, loser);
 
   comparisonIndex++;
 
   showComparison();
+
 }
 
 
-/* 結果表示 */
+/* =========================
+   結果を表示
+========================= */
+
 function showResult() {
 
   const ranking = Array.from(
-    {length: 27},
-    (_, i) => i
+    { length: PEOPLE },
+    (_, index) => index
   );
+
+  /* レーティング順に並べる */
 
   ranking.sort((a, b) => {
 
     if (ratings[b] !== ratings[a]) {
+
       return ratings[b] - ratings[a];
+
     }
 
     return wins[b] - wins[a];
 
   });
 
+
+  /* 上位9人 */
+
   const top9 = ranking.slice(0, 9);
 
-  document.getElementById("game").style.display = "none";
-  document.getElementById("result").style.display = "flex";
 
-  const grid = document.getElementById("resultGrid");
+  /* ゲーム画面を隠す */
+
+  document.getElementById("game").style.display =
+    "none";
+
+
+  /* 結果画面を表示 */
+
+  document.getElementById("result").style.display =
+    "flex";
+
+
+  const grid =
+    document.getElementById("resultGrid");
 
   grid.innerHTML = "";
 
+
+  /* 9枚を表示 */
+
   top9.forEach(index => {
 
-    const img = document.createElement("img");
+    const img =
+      document.createElement("img");
 
     img.src = images[index];
+
     img.alt = "";
 
     grid.appendChild(img);
 
   });
+
 }
 
 
-/* スタート */
+/* =========================
+   ゲーム開始
+========================= */
+
 createComparisons();
+
 showComparison();
 
 </script>
