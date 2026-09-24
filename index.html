@@ -171,8 +171,7 @@ h1 {
 const images = [];
 
 for (let i = 1; i <= 27; i++) {
-  images.push(String(i).padStart(2, "0") + ".jpg");
-}
+  images.push("images/" + String(i).padStart(2, "0") + ".jpg");
 
 let ratings = Array(27).fill(1500);
 let wins = Array(27).fill(0);
