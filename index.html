@@ -103,7 +103,24 @@ h1 {
   grid-template-columns: repeat(3, 1fr);
   gap: 4px;
 }
+.result-item {
+  position: relative;
+}
 
+.rank {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+
+  padding: 3px 7px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  font-size: 12px;
+  font-weight: bold;
+}
 .result-grid img {
   display: block;
   width: 100%;
