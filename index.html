@@ -410,18 +410,31 @@ function showResult() {
 
   /* 9枚を表示 */
 
-  top9.forEach(index => {
+  top9.forEach((index, rank) => {
 
-    const img =
-      document.createElement("img");
+  const item = document.createElement("div");
 
-    img.src = images[index];
+  item.className = "result-item";
 
-    img.alt = "";
+  const rankText = document.createElement("div");
 
-    grid.appendChild(img);
+  rankText.className = "rank";
 
-  });
+  rankText.textContent = (rank + 1) + "位";
+
+  const img = document.createElement("img");
+
+  img.src = images[index];
+
+  img.alt = "";
+
+  item.appendChild(rankText);
+
+  item.appendChild(img);
+
+  grid.appendChild(item);
+
+});
 
 }
 
