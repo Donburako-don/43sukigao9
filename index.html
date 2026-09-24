@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>43期ルート好き顔9選</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff8f5;
+  color: #5a4a45;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+               "Yu Gothic", sans-serif;
+  text-align: center;
+}
+
+.screen {
+  min-height: 100vh;
+  padding: 32px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  font-size: 26px;
+  margin: 0 0 12px;
+}
+
+.subtitle {
+  font-size: 14px;
+  margin: 0 0 28px;
+  color: #8b7770;
+}
+
+.progress {
+  font-size: 13px;
+  margin-bottom: 14px;
+  color: #9b8179;
+}
+
+.choices {
+  width: 100%;
+  max-width: 700px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.choice {
+  border: none;
+  padding: 0;
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(80, 50, 40, 0.12);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.choice:active {
+  transform: scale(0.97);
+}
+
+.choice img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+}
+
+#result {
+  display: none;
+}
+
+.result-title {
+  margin-bottom: 24px;
+}
+
+.result-grid {
+  width: 100%;
+  max-width: 600px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.result-grid img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  display: block;
+}
+
+.retry {
+  margin-top: 28px;
+  border: none;
+  background: #5a4a45;
+  color: white;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding: 24px 12px;
+  }
+
+  h1 {
+    font-size: 23px;
+  }
+
+  .choices {
+    gap: 8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ゲーム画面 -->
+<div id="game" class="screen">
+
+  <h1>43期ルート好き顔9選</h1>
+
+  <p class="subtitle">
+    直感で好きな顔を選んでね！
+  </p>
+
+  <div class="progress">
+    <span id="current">1</span> / 52
+  </div>
+
+  <div class="choices">
+    <button class="choice" onclick="choose(0)">
+      <img id="imageA" src="01.jpg" alt="">
+    </button>
+
+    <button class="choice" onclick="choose(1)">
+      <img id="imageB" src="02.jpg" alt="">
+    </button>
+  </div>
+
+</div>
+
+<!-- 結果画面 -->
+<div id="result" class="screen">
+
+  <h1 class="result-title">好き顔9選</h1>
+
+  <div id="resultGrid" class="result-grid"></div>
+
+  <button class="retry" onclick="location.reload()">
+    もう一度遊ぶ
+  </button>
+
+</div>
+
+
+<script>
+
+const images = [];
+
+for (let i = 1; i <= 27; i++) {
+  images.push(String(i).padStart(2, "0") + ".jpg");
+}
+
+let ratings = Array(27).fill(1500);
+let wins = Array(27).fill(0);
+
+let comparisons = [];
+let comparisonIndex = 0;
+
+const TOTAL_COMPARISONS = 52;
+
+
+/* 52回分の対戦カードを作る */
+function createComparisons() {
+
+  comparisons = [];
+
+  for (let round = 0; round < 4; round++) {
+
+    let people = Array.from({length: 27}, (_, i) => i);
+
+    people.sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < people.length - 1; i += 2) {
+
+      comparisons.push([
+        people[i],
+        people[i + 1]
+      ]);
+
+    }
+  }
+
+  comparisons = comparisons.slice(0, TOTAL_COMPARISONS);
+}
+
+
+/* Elo方式で順位を更新 */
+function updateRating(a, b) {
+
+  const Ra = ratings[a];
+  const Rb = ratings[b];
+
+  const expectedA =
+    1 / (1 + Math.pow(10, (Rb - Ra) / 400));
+
+  const expectedB =
+    1 - expectedA;
+
+  ratings[a] += 32 * (1 - expectedA);
+  ratings[b] += 32 * (0 - expectedB);
+
+  wins[a]++;
+}
+
+
+/* 画像を表示 */
+function showComparison() {
+
+  if (comparisonIndex >= TOTAL_COMPARISONS) {
+    showResult();
+    return;
+  }
+
+  const pair = comparisons[comparisonIndex];
+
+  document.getElementById("imageA").src =
+    images[pair[0]];
+
+  document.getElementById("imageB").src =
+    images[pair[1]];
+
+  document.getElementById("current").textContent =
+    comparisonIndex + 1;
+}
+
+
+/* 選択された */
+function choose(side) {
+
+  const pair = comparisons[comparisonIndex];
+
+  const winner =
+    side === 0 ? pair[0] : pair[1];
+
+  const loser =
+    side === 0 ? pair[1] : pair[0];
+
+  updateRating(winner, loser);
+
+  comparisonIndex++;
+
+  showComparison();
+}
+
+
+/* 結果表示 */
+function showResult() {
+
+  const ranking = Array.from(
+    {length: 27},
+    (_, i) => i
+  );
+
+  ranking.sort((a, b) => {
+
+    if (ratings[b] !== ratings[a]) {
+      return ratings[b] - ratings[a];
+    }
+
+    return wins[b] - wins[a];
+
+  });
+
+  const top9 = ranking.slice(0, 9);
+
+  document.getElementById("game").style.display = "none";
+  document.getElementById("result").style.display = "flex";
+
+  const grid = document.getElementById("resultGrid");
+
+  grid.innerHTML = "";
+
+  top9.forEach(index => {
+
+    const img = document.createElement("img");
+
+    img.src = images[index];
+    img.alt = "";
+
+    grid.appendChild(img);
+
+  });
+}
+
+
+/* スタート */
+createComparisons();
+showComparison();
+
+</script>
+
+</body>
+</html>
